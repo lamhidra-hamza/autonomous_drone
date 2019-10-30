@@ -120,23 +120,28 @@ def set_other_waypoints(vehicle):
 	yD = missionlst[4].y
 	disBC = math.sqrt((xC - xB)*(xC - xB) + (yC - yB)*(yC - yB))
 	disAD = math.sqrt((xD - xA)*(xD - xA) + (yD - yA)*(yD - yA))
-	l = 1
-	while (i < num):
-		if (l == 1):
-			x = xB - (( n1*(disBC/num)) * (xB - xC)) / disBC
-			y = yB - (( n1 *(disBC/num)) *(yB - yC)) / disBC
-			l -=1
-		elif l == 0:
-			x = xA - ((n2 *(disAD/num))*(xA - xD)) / disAD
-			y = yA - ((n2 * (disAD/num))*(yA - yD)) / disAD
-			l += 1
-		wp1= Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+	l1 = 1
+	l2 = 0
+	while (i / 2 < num - 1):
+		if (l1 != 0):
+			x = xB - ((n1 * (disBC/num)) * (xB - xC)) / disBC
+			y = yB - ((n1 * (disBC/num)) * (yB - yC)) / disBC
+			l1 -= 1
+			if l1 == 0:
+				l2 = 2
+			n1 += 1
+		elif l2 != 0:
+			x = xA - ((n2 * (disAD/num)) * (xA - xD)) / disAD
+			y = yA - ((n2 * (disAD/num)) * (yA - yD)) / disAD
+			l2 -= 1
+			if l2 == 0:
+				l1 = 2
+			n2 += 1
+		wp1 = Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
 					0, 0, 0, 0, 0, 0,
 					x, y, 10)
 		missionlst.insert(n, wp1)
 		n += 1
-		n1 += 1
-		n2 += 1
 		i += 1
 	cmds.clear()
 	for wp in missionlst:
